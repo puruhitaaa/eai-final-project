@@ -1,0 +1,13 @@
+{
+  "name": "profanity-checker-system",
+  "version": "1.0.0",
+  "description": "Profanity Checker System with Microservices, GraphQL, Docker, PostgreSQL, and Google Gemini AI",
+  "main": "index.js",
+  "scripts": {
+    "start": "docker-compose up",
+    "build": "docker-compose build",
+    "down": "docker-compose down"
+  },
+  "author": "",
+  "license": "MIT"
+}

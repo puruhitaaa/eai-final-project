@@ -1,0 +1,108 @@
+services:
+  gateway:
+    build: ./gateway
+    ports:
+      - "4000:4000"
+    depends_on:
+      - word-check
+      - synonym
+      - category
+      - report
+    environment:
+      - PORT=4000
+
+  word-check:
+    build: ./word-check-svc
+    environment:
+      - DB_HOST=word-check-db
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_NAME=wordcheck
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PORT=4001
+    depends_on:
+      - word-check-db
+
+  word-check-db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: wordcheck
+    volumes:
+      - word-check-data:/var/lib/postgresql/data
+
+  synonym:
+    build: ./synonym-svc
+    environment:
+      - DB_HOST=synonym-db
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_NAME=synonym
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PORT=4002
+    depends_on:
+      - synonym-db
+
+  synonym-db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: synonym
+    volumes:
+      - synonym-data:/var/lib/postgresql/data
+
+  category:
+    build: ./category-svc
+    environment:
+      - DB_HOST=category-db
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_NAME=category
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PORT=4003
+    depends_on:
+      - category-db
+
+  category-db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: category
+    volumes:
+      - category-data:/var/lib/postgresql/data
+
+  report:
+    build: ./report-svc
+    environment:
+      - DB_HOST=report-db
+      - DB_USER=user
+      - DB_PASSWORD=pass
+      - DB_NAME=report
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PORT=4004
+    depends_on:
+      - report-db
+
+  report-db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: pass
+      POSTGRES_DB: report
+    volumes:
+      - report-data:/var/lib/postgresql/data
+
+  gemini-proxy:
+    build: ./gemini-proxy
+    environment:
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - PORT=4005
+
+volumes:
+  word-check-data:
+  synonym-data:
+  category-data:
+  report-data:
