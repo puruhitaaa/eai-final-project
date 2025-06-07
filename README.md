@@ -32,18 +32,20 @@ Each service has its own PostgreSQL database and integrates with Google Gemini A
 ### Installation
 
 1. Clone this repository
-2. Set your Gemini API key as an environment variable:
+2. Create a `.env` file in the root directory with your Gemini API key:
    ```
-   export GEMINI_API_KEY=your_api_key_here
+   GEMINI_API_KEY=your_api_key_here
    ```
 3. Build and start the services:
    ```
-   npm run build
-   npm start
+   docker-compose build
+   docker-compose up
    ```
 4. Access the GraphQL playground at `http://localhost:4000/graphql`
 
 ## Usage Examples
+
+### GraphQL Queries and Mutations
 
 ```graphql
 # Check text for profanity
@@ -61,12 +63,72 @@ query {
   getReports(startDate: "2023-01-01", endDate: "2023-12-31") {
     id
     summary
-    flaggedWords
     categories {
       name
       count
     }
   }
+}
+```
+
+### Integration with Frontend Frameworks
+
+#### React and Apollo Client
+
+```javascript
+import { ApolloClient, InMemoryCache, gql } from "@apollo/client"
+
+const client = new ApolloClient({
+  uri: "http://localhost:4000/graphql",
+  cache: new InMemoryCache(),
+})
+
+// Check text for profanity
+const checkText = async (text) => {
+  const { data } = await client.query({
+    query: gql`
+      query CheckText($input: String!) {
+        checkText(input: $input) {
+          word
+          category
+          suggestions
+          geminiExplanation
+        }
+      }
+    `,
+    variables: { input: text },
+  })
+
+  return data.checkText
+}
+```
+
+#### JavaScript Fetch API
+
+```javascript
+async function checkText(text) {
+  const response = await fetch("http://localhost:4000/graphql", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      query: `
+        query CheckText($input: String!) {
+          checkText(input: $input) {
+            word
+            category
+            suggestions
+            geminiExplanation
+          }
+        }
+      `,
+      variables: { input: text },
+    }),
+  })
+
+  const { data } = await response.json()
+  return data.checkText
 }
 ```
 
