@@ -22,6 +22,7 @@ const gateway = new ApolloGateway({
       url: `http://report:4004/graphql`,
     },
   ],
+  experimental_pollInterval: 1000, // Poll every second until all subgraphs are available
 })
 
 // Initialize Apollo Server with the gateway
