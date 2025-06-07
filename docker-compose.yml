@@ -13,6 +13,8 @@ services:
 
   word-check:
     build: ./word-check-svc
+    ports:
+      - "4001:4001"
     environment:
       - DB_HOST=word-check-db
       - DB_USER=user
@@ -34,6 +36,8 @@ services:
 
   synonym:
     build: ./synonym-svc
+    ports:
+      - "4002:4002"
     environment:
       - DB_HOST=synonym-db
       - DB_USER=user
@@ -55,6 +59,8 @@ services:
 
   category:
     build: ./category-svc
+    ports:
+      - "4003:4003"
     environment:
       - DB_HOST=category-db
       - DB_USER=user
@@ -76,6 +82,8 @@ services:
 
   report:
     build: ./report-svc
+    ports:
+      - "4004:4004"
     environment:
       - DB_HOST=report-db
       - DB_USER=user
@@ -97,6 +105,8 @@ services:
 
   gemini-proxy:
     build: ./gemini-proxy
+    ports:
+      - "4005:4005"
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - PORT=4005

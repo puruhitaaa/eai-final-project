@@ -7,19 +7,19 @@ const gateway = new ApolloGateway({
   serviceList: [
     {
       name: "word-check",
-      url: `http://word-check:${process.env.PORT || 4001}/graphql`,
+      url: `http://word-check:4001/graphql`,
     },
     {
       name: "synonym",
-      url: `http://synonym:${process.env.PORT || 4002}/graphql`,
+      url: `http://synonym:4002/graphql`,
     },
     {
       name: "category",
-      url: `http://category:${process.env.PORT || 4003}/graphql`,
+      url: `http://category:4003/graphql`,
     },
     {
       name: "report",
-      url: `http://report:${process.env.PORT || 4004}/graphql`,
+      url: `http://report:4004/graphql`,
     },
   ],
 })
