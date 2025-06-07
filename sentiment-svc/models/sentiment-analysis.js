@@ -21,15 +21,15 @@ module.exports = (sequelize) => {
         type: DataTypes.FLOAT,
         validate: {
           min: 0.0,
-          max: 1.0,
+          max: 100.0,
         },
-        defaultValue: 0.5,
+        defaultValue: 50.0,
       },
       toxicityScore: {
         type: DataTypes.FLOAT,
         validate: {
           min: 0.0,
-          max: 1.0,
+          max: 100.0,
         },
         defaultValue: 0.0,
       },
@@ -37,9 +37,9 @@ module.exports = (sequelize) => {
         type: DataTypes.FLOAT,
         validate: {
           min: 0.0,
-          max: 1.0,
+          max: 100.0,
         },
-        defaultValue: 0.5,
+        defaultValue: 50.0,
       },
       aiGenerated: {
         type: DataTypes.BOOLEAN,

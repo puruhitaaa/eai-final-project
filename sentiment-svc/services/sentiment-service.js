@@ -7,9 +7,9 @@ class SentimentService {
     if (!text || text.trim().length === 0) {
       return {
         sentiment: "neutral",
-        appropriatenessScore: 0.5,
+        appropriatenessScore: 50,
         toxicityScore: 0,
-        professionalismScore: 0.5,
+        professionalismScore: 50,
         review: "Text is empty or contains only whitespace.",
       }
     }
@@ -92,9 +92,9 @@ class SentimentService {
     return {
       text: text,
       sentiment: "neutral",
-      appropriatenessScore: 0.5,
+      appropriatenessScore: 50,
       toxicityScore: 0,
-      professionalismScore: 0.5,
+      professionalismScore: 50,
       review: "Unable to analyze text.",
       aiGenerated: false,
       analysisDate: new Date(),

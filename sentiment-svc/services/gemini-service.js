@@ -21,9 +21,9 @@ class GeminiService {
     if (!this.isAvailable) {
       return {
         sentiment: "neutral",
-        appropriatenessScore: 0.5,
+        appropriatenessScore: 50,
         toxicityScore: 0,
-        professionalismScore: 0.5,
+        professionalismScore: 50,
         review:
           "Gemini AI service is not available. Please check your API key.",
       }
@@ -32,9 +32,9 @@ class GeminiService {
     if (!text || text.trim().length === 0) {
       return {
         sentiment: "neutral",
-        appropriatenessScore: 0.5,
+        appropriatenessScore: 50,
         toxicityScore: 0,
-        professionalismScore: 0.5,
+        professionalismScore: 50,
         review: "Text is empty or contains only whitespace.",
       }
     }
@@ -75,7 +75,7 @@ class GeminiService {
         try {
           const analysisResult = JSON.parse(jsonMatch[1])
 
-          // Validate and normalize scores
+          // Validate and normalize scores to ensure they're within 0-100 range
           analysisResult.appropriatenessScore = this.normalizeScore(
             analysisResult.appropriatenessScore
           )
@@ -95,9 +95,9 @@ class GeminiService {
       // Fallback if parsing fails
       return {
         sentiment: "neutral",
-        appropriatenessScore: 0.5,
+        appropriatenessScore: 50,
         toxicityScore: 0,
-        professionalismScore: 0.5,
+        professionalismScore: 50,
         review: "Unable to analyze the text content.",
         rawResponse: textResult,
       }
@@ -105,21 +105,21 @@ class GeminiService {
       console.error("Error calling Gemini API:", error)
       return {
         sentiment: "neutral",
-        appropriatenessScore: 0.5,
+        appropriatenessScore: 50,
         toxicityScore: 0,
-        professionalismScore: 0.5,
+        professionalismScore: 50,
         review: "An error occurred during analysis.",
         error: error.message,
       }
     }
   }
 
-  // Helper function to ensure scores are between 0 and 1
+  // Helper function to ensure scores are between 0 and 100
   normalizeScore(score) {
     if (typeof score !== "number") {
-      return 0.5
+      return 50
     }
-    return Math.max(0, Math.min(1, score))
+    return Math.max(0, Math.min(100, score))
   }
 }
 
