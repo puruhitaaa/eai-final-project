@@ -21,6 +21,10 @@ const gateway = new ApolloGateway({
       name: "report",
       url: `http://report:4004/graphql`,
     },
+    {
+      name: "sentiment",
+      url: `http://sentiment:4006/graphql`,
+    },
   ],
   experimental_pollInterval: 1000, // Poll every second until all subgraphs are available
 })
@@ -43,5 +47,6 @@ server.listen({ port: PORT }).then(({ url }) => {
   - Word Check Service
   - Synonym Service
   - Category Service
-  - Report Service`)
+  - Report Service
+  - Sentiment Analysis Service`)
 })
