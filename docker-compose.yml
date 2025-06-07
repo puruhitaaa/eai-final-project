@@ -4,12 +4,17 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - word-check
-      - synonym
-      - category
-      - report
+      word-check:
+        condition: service_healthy
+      synonym:
+        condition: service_healthy
+      category:
+        condition: service_healthy
+      report:
+        condition: service_healthy
     environment:
       - PORT=4000
+    restart: on-failure
 
   word-check:
     build: ./word-check-svc
@@ -23,7 +28,15 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - PORT=4001
     depends_on:
-      - word-check-db
+      word-check-db:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4001/graphql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
 
   word-check-db:
     image: postgres:14
@@ -33,6 +46,12 @@ services:
       POSTGRES_DB: wordcheck
     volumes:
       - word-check-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user", "-d", "wordcheck"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   synonym:
     build: ./synonym-svc
@@ -46,7 +65,15 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - PORT=4002
     depends_on:
-      - synonym-db
+      synonym-db:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4002/graphql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
 
   synonym-db:
     image: postgres:14
@@ -56,6 +83,12 @@ services:
       POSTGRES_DB: synonym
     volumes:
       - synonym-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user", "-d", "synonym"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   category:
     build: ./category-svc
@@ -69,7 +102,15 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - PORT=4003
     depends_on:
-      - category-db
+      category-db:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4003/graphql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
 
   category-db:
     image: postgres:14
@@ -79,6 +120,12 @@ services:
       POSTGRES_DB: category
     volumes:
       - category-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user", "-d", "category"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   report:
     build: ./report-svc
@@ -92,7 +139,15 @@ services:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - PORT=4004
     depends_on:
-      - report-db
+      report-db:
+        condition: service_healthy
+    restart: on-failure
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4004/graphql"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 15s
 
   report-db:
     image: postgres:14
@@ -102,6 +157,12 @@ services:
       POSTGRES_DB: report
     volumes:
       - report-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "user", "-d", "report"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   gemini-proxy:
     build: ./gemini-proxy

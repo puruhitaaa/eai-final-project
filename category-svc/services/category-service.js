@@ -66,7 +66,7 @@ class CategoryService {
     const [wordCategory, created] = await WordCategory.findOrCreate({
       where: { word: word.toLowerCase() },
       defaults: {
-        CategoryId: categoryId,
+        categoryId: categoryId,
         confidence,
         aiGenerated,
         lastUpdated: new Date(),
@@ -75,7 +75,7 @@ class CategoryService {
 
     if (!created) {
       // Update existing entry
-      wordCategory.CategoryId = categoryId
+      wordCategory.categoryId = categoryId
       wordCategory.confidence = confidence
       wordCategory.aiGenerated = aiGenerated
       wordCategory.lastUpdated = new Date()

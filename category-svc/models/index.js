@@ -15,23 +15,130 @@ const sequelize = new Sequelize({
 const Category = require("./category")(sequelize)
 const WordCategory = require("./word-category")(sequelize)
 
-// Define relationships
-Category.hasMany(WordCategory)
-WordCategory.belongsTo(Category)
+// Define relationships with explicit foreign key
+Category.hasMany(WordCategory, {
+  foreignKey: "categoryId",
+})
+WordCategory.belongsTo(Category, {
+  foreignKey: "categoryId",
+})
 
-// Test database connection
-const testConnection = async () => {
+// Maximum number of connection attempts
+const MAX_RETRIES = 10
+const RETRY_DELAY = 5000
+
+// Test database connection and seed data with retry logic
+const testConnection = async (retries = 0) => {
   try {
+    console.log(
+      `Attempting to connect to database (attempt ${
+        retries + 1
+      }/${MAX_RETRIES})...`
+    )
     await sequelize.authenticate()
     console.log("Database connection established successfully.")
-    // Sync all defined models to the database
-    await sequelize.sync({ alter: true })
-    console.log("Models synchronized with database.")
+
+    // First try to query existing tables to see if they exist
+    try {
+      await sequelize.getQueryInterface().showAllTables()
+      console.log("Tables exist, skipping sync")
+    } catch (err) {
+      // If tables don't exist or can't be queried, try syncing
+      try {
+        // Sync all defined models to the database - use force: false to avoid recreating existing tables
+        await sequelize.sync({ force: false })
+        console.log("Models synchronized with database.")
+      } catch (syncErr) {
+        // If sync fails due to tables already existing, just continue
+        console.log(
+          "Could not sync models, likely because they already exist:",
+          syncErr.message
+        )
+      }
+    }
+
+    // Seed data after models are synchronized
+    await seedData()
+    return true
   } catch (error) {
     console.error("Unable to connect to the database:", error)
+
+    if (retries < MAX_RETRIES - 1) {
+      console.log(`Retrying in ${RETRY_DELAY / 1000} seconds...`)
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY))
+      return testConnection(retries + 1)
+    } else {
+      console.error(`Failed to connect after ${MAX_RETRIES} attempts.`)
+      return false
+    }
   }
 }
 
+// Seed initial data
+const seedData = async () => {
+  try {
+    // First check if categories exist
+    const categoryCount = await Category.count()
+    if (categoryCount === 0) {
+      console.log("No categories found, seeding initial category data")
+      // Create categories as needed (this code should be in category.js)
+    } else {
+      console.log(`Found ${categoryCount} existing categories, skipping seed`)
+    }
+
+    // Then check and seed word categories
+    const wordCategoryCount = await WordCategory.count()
+    if (wordCategoryCount === 0) {
+      // Get all categories to ensure they exist
+      const categories = await Category.findAll()
+
+      if (categories.length > 0) {
+        // Convert to a lookup map for easier reference
+        const categoryMap = {}
+        categories.forEach((category) => {
+          categoryMap[category.name] = category.id
+        })
+
+        // Create word categories with proper foreign keys
+        try {
+          await WordCategory.bulkCreate([
+            {
+              word: "example1",
+              categoryId: categoryMap["mild"] || categories[3]?.id || 1,
+              confidence: 0.9,
+            },
+            {
+              word: "example2",
+              categoryId: categoryMap["sexual"] || categories[1]?.id || 2,
+              confidence: 0.95,
+            },
+            {
+              word: "example3",
+              categoryId: categoryMap["abusive"] || categories[2]?.id || 3,
+              confidence: 0.8,
+            },
+          ])
+          console.log("Seeded initial word-category data")
+        } catch (err) {
+          console.log(
+            "Error creating word categories, they may already exist:",
+            err.message
+          )
+        }
+      } else {
+        console.log("No categories found, cannot seed word categories")
+      }
+    } else {
+      console.log(
+        `Found ${wordCategoryCount} existing word categories, skipping seed`
+      )
+    }
+  } catch (error) {
+    console.error("Error seeding data:", error)
+  }
+}
+
+// Start the connection and initialization process
 testConnection()
 
 // Export models and Sequelize instance

@@ -27,22 +27,12 @@ module.exports = (sequelize) => {
       type: DataTypes.DATE,
       defaultValue: DataTypes.NOW,
     },
+    // Explicitly define the foreign key
+    categoryId: {
+      type: DataTypes.INTEGER,
+      field: "categoryId",
+      allowNull: true,
+    },
   })
-
-  // Seed some initial data
-  WordCategory.sync().then(async () => {
-    const count = await WordCategory.count()
-    if (count === 0) {
-      // This would be populated with actual word-category mappings
-      // For demo purposes, we'll use the example words from the WordCheck service
-      await WordCategory.bulkCreate([
-        { word: "example1", CategoryId: 4, confidence: 0.9 }, // mild
-        { word: "example2", CategoryId: 2, confidence: 0.95 }, // sexual
-        { word: "example3", CategoryId: 3, confidence: 0.8 }, // abusive
-      ])
-      console.log("Seeded initial word-category data")
-    }
-  })
-
   return WordCategory
 }

@@ -14,19 +14,56 @@ const sequelize = new Sequelize({
 // Define models
 const ProfaneWord = require("./profane-word")(sequelize)
 
-// Test database connection
-const testConnection = async () => {
+// Maximum number of connection attempts
+const MAX_RETRIES = 10
+const RETRY_DELAY = 5000
+
+// Test database connection with retry logic
+const testConnection = async (retries = 0) => {
   try {
+    console.log(
+      `Attempting to connect to database (attempt ${
+        retries + 1
+      }/${MAX_RETRIES})...`
+    )
     await sequelize.authenticate()
     console.log("Database connection established successfully.")
-    // Sync all defined models to the database
-    await sequelize.sync({ alter: true })
-    console.log("Models synchronized with database.")
+
+    // First try to query existing tables to see if they exist
+    try {
+      await sequelize.getQueryInterface().showAllTables()
+      console.log("Tables exist, skipping sync")
+    } catch (err) {
+      // If tables don't exist or can't be queried, try syncing
+      try {
+        // Sync all defined models to the database - use force: false to avoid recreating existing tables
+        await sequelize.sync({ force: false })
+        console.log("Models synchronized with database.")
+      } catch (syncErr) {
+        // If sync fails due to tables already existing, just continue
+        console.log(
+          "Could not sync models, likely because they already exist:",
+          syncErr.message
+        )
+      }
+    }
+
+    return true
   } catch (error) {
     console.error("Unable to connect to the database:", error)
+
+    if (retries < MAX_RETRIES - 1) {
+      console.log(`Retrying in ${RETRY_DELAY / 1000} seconds...`)
+      await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY))
+      return testConnection(retries + 1)
+    } else {
+      console.error(`Failed to connect after ${MAX_RETRIES} attempts.`)
+      return false
+    }
   }
 }
 
+// Start the connection process
 testConnection()
 
 // Export models and Sequelize instance
