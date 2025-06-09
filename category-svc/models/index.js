@@ -38,28 +38,18 @@ const testConnection = async (retries = 0) => {
     await sequelize.authenticate()
     console.log("Database connection established successfully.")
 
-    // First try to query existing tables to see if they exist
     try {
-      await sequelize.getQueryInterface().showAllTables()
-      console.log("Tables exist, skipping sync")
-    } catch (err) {
-      // If tables don't exist or can't be queried, try syncing
-      try {
-        // Sync all defined models to the database - use force: false to avoid recreating existing tables
-        await sequelize.sync({ force: false })
-        console.log("Models synchronized with database.")
-      } catch (syncErr) {
-        // If sync fails due to tables already existing, just continue
-        console.log(
-          "Could not sync models, likely because they already exist:",
-          syncErr.message
-        )
-      }
-    }
+      // Always sync models to ensure tables exist with correct structure
+      await sequelize.sync({ force: false })
+      console.log("Models synchronized with database.")
 
-    // Seed data after models are synchronized
-    await seedData()
-    return true
+      // Seed data after models are synchronized
+      await seedData()
+      return true
+    } catch (syncErr) {
+      console.error("Error syncing models:", syncErr.message)
+      return false
+    }
   } catch (error) {
     console.error("Unable to connect to the database:", error)
 
@@ -81,7 +71,30 @@ const seedData = async () => {
     const categoryCount = await Category.count()
     if (categoryCount === 0) {
       console.log("No categories found, seeding initial category data")
-      // Create categories as needed (this code should be in category.js)
+      // Create initial categories
+      await Category.bulkCreate([
+        {
+          name: "racial",
+          description: "Content that discriminates based on race or ethnicity",
+          severityLevel: 5,
+        },
+        {
+          name: "sexual",
+          description: "Sexually explicit or inappropriate content",
+          severityLevel: 4,
+        },
+        {
+          name: "abusive",
+          description: "Content that is abusive, threatening or harassing",
+          severityLevel: 4,
+        },
+        {
+          name: "mild",
+          description: "Mildly inappropriate language",
+          severityLevel: 1,
+        },
+      ])
+      console.log("Seeded initial category data")
     } else {
       console.log(`Found ${categoryCount} existing categories, skipping seed`)
     }
