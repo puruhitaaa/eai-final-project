@@ -38,26 +38,15 @@ const testConnection = async (retries = 0) => {
     await sequelize.authenticate()
     console.log("Database connection established successfully.")
 
-    // First try to query existing tables to see if they exist
     try {
-      await sequelize.getQueryInterface().showAllTables()
-      console.log("Tables exist, skipping sync")
-    } catch (err) {
-      // If tables don't exist or can't be queried, try syncing
-      try {
-        // Sync all defined models to the database - use force: false to avoid recreating existing tables
-        await sequelize.sync({ force: false })
-        console.log("Models synchronized with database.")
-      } catch (syncErr) {
-        // If sync fails due to tables already existing, just continue
-        console.log(
-          "Could not sync models, likely because they already exist:",
-          syncErr.message
-        )
-      }
+      // Always sync models to ensure tables exist with correct structure
+      await sequelize.sync({ force: false })
+      console.log("Models synchronized with database.")
+      return true
+    } catch (syncErr) {
+      console.error("Error syncing models:", syncErr.message)
+      return false
     }
-
-    return true
   } catch (error) {
     console.error("Unable to connect to the database:", error)
 
