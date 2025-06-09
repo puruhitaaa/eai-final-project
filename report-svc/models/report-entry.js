@@ -29,6 +29,11 @@ module.exports = (sequelize) => {
         type: DataTypes.INTEGER,
         defaultValue: 1,
       },
+      reportId: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+        field: "reportId",
+      },
     },
     {
       tableName: "ReportEntry",

@@ -75,7 +75,7 @@ class ReportService {
 
       // Associate entries with the report
       await Promise.all(
-        entries.map((entry) => entry.update({ ReportId: report.id }))
+        entries.map((entry) => entry.update({ reportId: report.id }))
       )
 
       return {
@@ -120,7 +120,7 @@ class ReportService {
     const where = {}
 
     if (reportId) {
-      where.ReportId = reportId
+      where.reportId = reportId
     }
 
     if (startDate && endDate) {

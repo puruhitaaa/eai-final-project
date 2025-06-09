@@ -17,10 +17,17 @@ const ReportEntry = require("./report-entry")(sequelize)
 
 // Define relationships with explicit foreign keys
 Report.hasMany(ReportEntry, {
-  foreignKey: "reportId",
+  foreignKey: {
+    name: "reportId",
+    field: "reportId",
+  },
 })
+
 ReportEntry.belongsTo(Report, {
-  foreignKey: "reportId",
+  foreignKey: {
+    name: "reportId",
+    field: "reportId",
+  },
 })
 
 // Maximum number of connection attempts
