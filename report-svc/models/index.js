@@ -47,7 +47,7 @@ const testConnection = async (retries = 0) => {
 
     try {
       // Always sync models to ensure tables exist with correct structure
-      await sequelize.sync({ force: false })
+      await sequelize.sync({ force: false, alter: true })
       console.log("Models synchronized with database.")
       return true
     } catch (syncErr) {

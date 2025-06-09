@@ -67,6 +67,8 @@ class ReportService {
         startDate: start,
         endDate: end,
         summary: aiResult.summary || "No summary available",
+        insights: aiResult.insights || [],
+        riskAssessment: aiResult.riskAssessment || "Unknown",
         totalFlagged: entries.length,
         categoryBreakdown,
         aiGenerated: !!aiResult.summary,
@@ -105,6 +107,19 @@ class ReportService {
 
     if (!report) {
       throw new Error(`Report with ID ${id} not found`)
+    }
+
+    // Ensure insights and riskAssessment exist, if not, provide defaults
+    if (
+      !report.insights ||
+      !Array.isArray(report.insights) ||
+      report.insights.length === 0
+    ) {
+      report.insights = []
+    }
+
+    if (!report.riskAssessment) {
+      report.riskAssessment = "Unknown"
     }
 
     return report

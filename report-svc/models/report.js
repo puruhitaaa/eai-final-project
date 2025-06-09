@@ -25,6 +25,16 @@ module.exports = (sequelize) => {
         type: DataTypes.TEXT,
         allowNull: true,
       },
+      insights: {
+        type: DataTypes.JSON,
+        allowNull: true,
+        defaultValue: [],
+      },
+      riskAssessment: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        defaultValue: "Unknown",
+      },
       totalFlagged: {
         type: DataTypes.INTEGER,
         defaultValue: 0,

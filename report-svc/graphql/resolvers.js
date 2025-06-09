@@ -1,5 +1,7 @@
 const reportService = require("../services/report-service")
+const geminiService = require("../services/gemini-service")
 const { GraphQLScalarType } = require("graphql")
+const { ReportEntry } = require("../models")
 
 // Custom scalar for JSON
 const JSONScalar = new GraphQLScalarType({
@@ -61,6 +63,26 @@ const resolvers = {
         )
       }
       return []
+    },
+
+    insights(report) {
+      // Return insights from database if available
+      if (
+        report.insights &&
+        Array.isArray(report.insights) &&
+        report.insights.length > 0
+      ) {
+        return report.insights
+      }
+      return []
+    },
+
+    riskAssessment(report) {
+      // Return risk assessment from database if available
+      if (report.riskAssessment) {
+        return report.riskAssessment
+      }
+      return "Unknown"
     },
 
     async entries(report, { limit = 100, offset = 0 }) {
