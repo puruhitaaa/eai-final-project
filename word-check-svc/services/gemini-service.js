@@ -38,10 +38,18 @@ class GeminiService {
           "flaggedWords": [
             {
               "word": "word or phrase that was flagged",
-              "explanation": "brief explanation of why this is considered profane"
+              "explanation": "brief explanation of why this is considered profane",
+              "severity": number (1-5, where 1 is mild and 5 is most severe)
             }
           ]
         }
+        
+        For severity ratings:
+        - 1: Mild words that may be inappropriate in formal settings
+        - 2: Moderately inappropriate language
+        - 3: Offensive but common language
+        - 4: Highly offensive terms
+        - 5: Extremely offensive, slurs, hate speech
         
         If no profanity is detected, return an empty array for flaggedWords.
       `
@@ -54,7 +62,26 @@ class GeminiService {
       const jsonMatch = textResult.match(/({[\s\S]*})/)
       if (jsonMatch && jsonMatch[1]) {
         try {
-          return JSON.parse(jsonMatch[1])
+          const parsedResult = JSON.parse(jsonMatch[1])
+
+          // Ensure severity is within valid range for each flagged word
+          if (
+            parsedResult.flaggedWords &&
+            Array.isArray(parsedResult.flaggedWords)
+          ) {
+            parsedResult.flaggedWords.forEach((word) => {
+              if (
+                !word.severity ||
+                typeof word.severity !== "number" ||
+                word.severity < 1 ||
+                word.severity > 5
+              ) {
+                word.severity = 2 // Default if not provided or invalid
+              }
+            })
+          }
+
+          return parsedResult
         } catch (e) {
           console.error("Error parsing Gemini response:", e)
           return {
