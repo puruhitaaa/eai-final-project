@@ -13,10 +13,10 @@ module.exports = (sequelize) => {
     },
     confidence: {
       type: DataTypes.FLOAT,
-      defaultValue: 1.0,
+      defaultValue: 100.0,
       validate: {
         min: 0.0,
-        max: 1.0,
+        max: 100.0,
       },
     },
     aiGenerated: {

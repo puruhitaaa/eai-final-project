@@ -33,13 +33,13 @@ class SynonymService {
     return []
   }
 
-  async saveSynonyms(word, synonyms, appropriatenessScore = 5) {
+  async saveSynonyms(word, synonyms, appropriatenessScore = 50) {
     // Update or create synonym entry
     const [synonym, created] = await Synonym.findOrCreate({
       where: { word: word.toLowerCase() },
       defaults: {
         synonyms,
-        appropriatenessScore: appropriatenessScore || 5,
+        appropriatenessScore: appropriatenessScore || 50,
         lastUpdated: new Date(),
       },
     })

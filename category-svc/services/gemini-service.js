@@ -44,7 +44,7 @@ class GeminiService {
         Respond with JSON in the following format:
         {
           "category": "category_name",
-          "confidence": number (0.0-1.0, where 1.0 is complete confidence),
+          "confidence": number (0-100, where 100 is complete confidence),
           "explanation": "brief explanation of why this category was chosen"
         }
       `

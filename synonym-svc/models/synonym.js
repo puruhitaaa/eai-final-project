@@ -19,8 +19,8 @@ module.exports = (sequelize) => {
       type: DataTypes.INTEGER,
       defaultValue: 5,
       validate: {
-        min: 1,
-        max: 10,
+        min: 0,
+        max: 100,
       },
     },
     lastUpdated: {
@@ -37,17 +37,17 @@ module.exports = (sequelize) => {
         {
           word: "example1",
           synonyms: ["alternative1", "substitute1", "replacement1"],
-          appropriatenessScore: 8,
+          appropriatenessScore: 80,
         },
         {
           word: "example2",
           synonyms: ["alternative2", "substitute2", "replacement2"],
-          appropriatenessScore: 9,
+          appropriatenessScore: 90,
         },
         {
           word: "example3",
           synonyms: ["alternative3", "substitute3", "replacement3"],
-          appropriatenessScore: 7,
+          appropriatenessScore: 70,
         },
       ])
       console.log("Seeded initial synonym data")

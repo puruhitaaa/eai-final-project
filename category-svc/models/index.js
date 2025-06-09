@@ -105,17 +105,17 @@ const seedData = async () => {
             {
               word: "example1",
               categoryId: categoryMap["mild"] || categories[3]?.id || 1,
-              confidence: 0.9,
+              confidence: 90,
             },
             {
               word: "example2",
               categoryId: categoryMap["sexual"] || categories[1]?.id || 2,
-              confidence: 0.95,
+              confidence: 95,
             },
             {
               word: "example3",
               categoryId: categoryMap["abusive"] || categories[2]?.id || 3,
-              confidence: 0.8,
+              confidence: 80,
             },
           ])
           console.log("Seeded initial word-category data")

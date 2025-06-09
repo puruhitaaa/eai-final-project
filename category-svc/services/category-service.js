@@ -38,7 +38,7 @@ class CategoryService {
         await this.saveWordCategory(
           word,
           category.id,
-          aiResult.confidence || 0.7,
+          aiResult.confidence || 70,
           true
         )
 
@@ -47,7 +47,7 @@ class CategoryService {
           category: category.name,
           description: category.description,
           severityLevel: category.severityLevel,
-          confidence: aiResult.confidence || 0.7,
+          confidence: aiResult.confidence || 70,
           explanation: aiResult.explanation,
         }
       }
@@ -59,7 +59,7 @@ class CategoryService {
   async saveWordCategory(
     word,
     categoryId,
-    confidence = 1.0,
+    confidence = 100.0,
     aiGenerated = false
   ) {
     // Update or create word-category entry
