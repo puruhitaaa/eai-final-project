@@ -21,11 +21,12 @@ module.exports = (sequelize) => {
     },
     appropriatenessScore: {
       type: DataTypes.INTEGER,
-      defaultValue: 5,
+      defaultValue: 50,
       validate: {
         min: 0,
         max: 100,
       },
+      comment: "0 is least appropriate, 100 is most appropriate",
     },
     lastUpdated: {
       type: DataTypes.DATE,

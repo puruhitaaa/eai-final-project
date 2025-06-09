@@ -34,12 +34,16 @@ class SynonymService {
   }
 
   async saveSynonyms(word, synonyms, appropriatenessScore = 50) {
+    // Ensure appropriatenessScore is within the valid range (0-100)
+    let validScore = appropriatenessScore || 50
+    validScore = Math.min(100, Math.max(0, validScore))
+
     // Update or create synonym entry
     const [synonym, created] = await Synonym.findOrCreate({
       where: { word: word.toLowerCase() },
       defaults: {
         synonyms,
-        appropriatenessScore: appropriatenessScore || 50,
+        appropriatenessScore: validScore,
         lastUpdated: new Date(),
       },
     })
@@ -47,8 +51,12 @@ class SynonymService {
     if (!created) {
       // Update existing entry
       synonym.synonyms = synonyms
-      synonym.appropriatenessScore =
-        appropriatenessScore || synonym.appropriatenessScore
+
+      // Only update the score if a new valid one was provided
+      if (appropriatenessScore !== undefined) {
+        synonym.appropriatenessScore = validScore
+      }
+
       synonym.lastUpdated = new Date()
       await synonym.save()
     }
@@ -59,10 +67,17 @@ class SynonymService {
   async getAllSynonyms() {
     const synonyms = await Synonym.findAll()
     return synonyms.map((synonym) => {
+      // Ensure appropriatenessScore is within 0-100 range
+      const score =
+        synonym.appropriatenessScore !== null &&
+        synonym.appropriatenessScore !== undefined
+          ? Math.min(100, Math.max(0, synonym.appropriatenessScore))
+          : 50
+
       return {
         word: synonym.word,
-        suggestions: synonym.synonyms || [], // Ensure suggestions is populated
-        appropriatenessScore: synonym.appropriatenessScore,
+        suggestions: synonym.synonyms || [],
+        appropriatenessScore: score,
         lastUpdated: synonym.lastUpdated,
       }
     })
@@ -79,6 +94,10 @@ class SynonymService {
       return {
         word: synonym.word,
         suggestions: synonym.synonyms || [],
+        appropriatenessScore:
+          synonym.appropriatenessScore !== null
+            ? Math.min(100, Math.max(0, synonym.appropriatenessScore))
+            : 50,
       }
     }
 

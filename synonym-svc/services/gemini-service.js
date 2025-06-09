@@ -42,8 +42,15 @@ class GeminiService {
             "alternative4",
             "alternative5"
           ],
-          "appropriatenessScore": number (0-100, where 100 is completely appropriate)
+          "appropriatenessScore": number (0-100, where 0 is least appropriate and 100 is most appropriate)
         }
+        
+        The appropriatenessScore should reflect how appropriate the original word is:
+        - Score 0-20: Highly inappropriate/offensive terms
+        - Score 21-40: Moderately inappropriate terms
+        - Score 41-60: Slightly inappropriate or context-dependent terms
+        - Score 61-80: Generally appropriate terms with rare exceptions
+        - Score 81-100: Completely appropriate terms
       `
 
       const result = await this.model.generateContent(prompt)
@@ -54,12 +61,25 @@ class GeminiService {
       const jsonMatch = textResult.match(/({[\s\S]*})/)
       if (jsonMatch && jsonMatch[1]) {
         try {
-          return JSON.parse(jsonMatch[1])
+          const parsed = JSON.parse(jsonMatch[1])
+
+          // Ensure the appropriatenessScore is within the valid range
+          if (parsed.appropriatenessScore !== undefined) {
+            parsed.appropriatenessScore = Math.min(
+              100,
+              Math.max(0, parsed.appropriatenessScore)
+            )
+          } else {
+            parsed.appropriatenessScore = 50 // Default middle value
+          }
+
+          return parsed
         } catch (e) {
           console.error("Error parsing Gemini response:", e)
           return {
             suggestions: [],
             error: "Failed to parse AI response",
+            appropriatenessScore: 50,
           }
         }
       }
@@ -67,12 +87,14 @@ class GeminiService {
       return {
         suggestions: [],
         rawResponse: textResult,
+        appropriatenessScore: 50,
       }
     } catch (error) {
       console.error("Error calling Gemini API:", error)
       return {
         suggestions: [],
         error: error.message,
+        appropriatenessScore: 50,
       }
     }
   }
