@@ -42,7 +42,7 @@ class GeminiService {
             "alternative4",
             "alternative5"
           ],
-          "appropriatenessScore": number (0-100, where 10 is completely appropriate)
+          "appropriatenessScore": number (0-100, where 100 is completely appropriate)
         }
       `
 

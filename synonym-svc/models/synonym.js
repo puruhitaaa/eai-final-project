@@ -12,8 +12,12 @@ module.exports = (sequelize) => {
       allowNull: false,
     },
     synonyms: {
-      type: DataTypes.ARRAY(DataTypes.STRING),
+      type: DataTypes.JSON,
       defaultValue: [],
+      get() {
+        const value = this.getDataValue("synonyms")
+        return value || []
+      },
     },
     appropriatenessScore: {
       type: DataTypes.INTEGER,

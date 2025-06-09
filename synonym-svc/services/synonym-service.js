@@ -57,7 +57,15 @@ class SynonymService {
   }
 
   async getAllSynonyms() {
-    return await Synonym.findAll()
+    const synonyms = await Synonym.findAll()
+    return synonyms.map((synonym) => {
+      return {
+        word: synonym.word,
+        suggestions: synonym.synonyms || [], // Ensure suggestions is populated
+        appropriatenessScore: synonym.appropriatenessScore,
+        lastUpdated: synonym.lastUpdated,
+      }
+    })
   }
 
   async getSynonymsByWord(word) {
@@ -70,7 +78,7 @@ class SynonymService {
     if (synonym) {
       return {
         word: synonym.word,
-        suggestions: synonym.synonyms,
+        suggestions: synonym.synonyms || [],
       }
     }
 
